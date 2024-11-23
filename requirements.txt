@@ -1,0 +1,17 @@
+openai
+ollama  # Assuming ollama is a valid library
+google-auth  # Required for google.generativeai
+google-auth-oauthlib  # Required for google.generativeai
+google-generativeai
+firebase-admin
+python-dotenv
+nltk
+sumy
+numpy
+# openai==0.27.0
+# ollama==1.2.0  # Adjust version as needed
+# google-generativeai==0.1.0  # Replace with correct version if different
+# python-dotenv==1.0.0
+# firebase-admin==6.0.0
+# nltk==3.8.1
+# sumy==0.8.1
