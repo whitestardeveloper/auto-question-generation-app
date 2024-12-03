@@ -4,9 +4,7 @@ from models import generate_question
 from prompts import get_prompt
 from summarization import summarize_text
 import time
-import os
-from dotenv import load_dotenv
-load_dotenv()
+
 
 # 3 seviye zorluk derecesi
 diff_levels = ["kolay", "orta", "zor"]
@@ -28,9 +26,19 @@ models = [
     "MISTRAL (mistral-nemo)",
     "META (llama3.1)",
     "ALIBABA (qwen2.5)",
-    "NVIDIA (nvidia/nemotron-4-340b-instruct)",
     "Cohere For AI (aya-expanse)[8B]",
+    "NVIDIA (nvidia/nemotron-4-340b-instruct)",
 ]
+
+# models = [
+#     "GOOGLE (gemini-1.5-flash)",
+#     "GOOGLE (gemma2) [27b]",
+#     "MISTRAL (mistral-small) [22b]",
+#     "META (llama3.1) [70b]",
+#     "ALIBABA (qwen2.5) [32b]",
+#     "Cohere For AI (aya-expanse)[32b]",
+#     "NVIDIA (nvidia/nemotron-4-340b-instruct)",
+# ]
 
 
 # 60 farklı soru heterojen soru kaynağı
@@ -63,7 +71,7 @@ def build_source_list():
 # Her üretimde 3 adet soru üretilecek.
 # Üretim ayrı ayrı olmak üzere "Çoktan Seçmeli", "Doğru Yanlış", "Boşluk doldurma", "Açık Soru", "Eşleştirme" ve "Kısa Cevaplı" soru tiplerinden olacak.
 # Sorular 3 ayrı zorluk düzeyinde gerçekleşecek. (Kolay, Orta ve Zor)
-# Yukarıdaki sayılan özelliklerin hepsi ayrı ayrı 7 model üzerinde denenecek. ("GOOGLE (gemini-1.5-flash)", "GOOGLE (gemma2)", "MISTRAL (mistral-nemo)", "META (llama3.1)",  "ALIBABA (qwen2.5)", "NVIDIA (nvidia/nemotron-4-340b-instruct)", "Cohere For AI (aya-expanse)[8B])
+# Yukarıdaki sayılan özelliklerin hepsi ayrı ayrı 7 model üzerinde denenecek. ("GOOGLE (gemini-1.5-flash)", "GOOGLE (gemma2) [27b]", "MISTRAL (mistral-small) [22b]", "META (llama3.1) [70b]",  "ALIBABA (qwen2.5) [32b]", "NVIDIA (nvidia/nemotron-4-340b-instruct)", "Cohere For AI (aya-expanse)[32b])
 # Toplamda 3 * 6 * 60 * 7 = 7560 * 3(soru adedi) => 22.680 adet soru üretilmiş olacak.
 
 
@@ -75,7 +83,26 @@ def get_question_choice_count(q_type):
 
 def run():
     question_index = 0
+    #job_list_ollama_models
+    # job_list = [
+    #     2,3,4,5,6,
+    #     422,423,424,425,426,
+    #     842,843,844,845,846,
+    #     1262,1263,1264,1265,1266,
+    #     1682,1683,1684,1685,1686,
+    #     2102,2103,2104,2105,2106,
+    # ]
 
+    # job_list = [
+    #     1,2,3,4,5,6,7,
+    #     421,422,423,424,425,426,427,
+    #     841,842,843,844,845,846,847,
+    #     1261,1262,1263,1264,1265,1266,1267,
+    #     1681,1682,1683,1684,1685,1686,1687,
+    #     2101,2102,2103,2104,2105,2106,2107,
+    # ]
+
+    
     heterogenius_sources = build_source_list()
     for diff_level in diff_levels:
         for q_type in q_types:
@@ -90,36 +117,36 @@ def run():
                 for model in models:
                     question_index += 1
 
-                    if question_index > int(os.environ.get("LAST_QUESTION_INDEX", '5000')):
+                    if question_index > 0:
+                        print('*' * 50)
                         print(
                             f"{question_index}-{diff_level}-{q_type}-{model}-{group_item_list[0]['course']}-{group_item_list[0]['class']}-{group_item_list[0]['category']}- {source_token_size} STARTED!"
                         )
 
-                        prompt = get_prompt(q_type, 3, diff_level)
+                        system_prompt = get_prompt(q_type, 3, diff_level)
 
                         # q gen started
-                        summarized_text = None
-                        token_size = len(source_text) + 600
-
+                        token_size = len(source_text + system_prompt)
                         print(token_size)
 
+                        summarized_text = None
                         is_limited = True if "NVIDIA" in model or "gemini" in model else False
                         if is_limited and token_size > 4096:  # max_token_size for nvidia models
                             summarized_text = summarize_text(source_text)
-                            text = summarized_text
+                            user_propmt = summarized_text
                         else:
-                            text = source_text
+                            user_propmt = source_text
 
-                        question_gen_propmt = '"' + text + '"' + prompt
 
                         try:
                             start_time = time.time()
-                            response_text = generate_question(model, question_gen_propmt)
+                            response_text = generate_question(model, system_prompt, user_propmt)
                             end_time = time.time()
                             elapsed_time = end_time - start_time
 
                             # q gen ended
                             question_gen_data = {
+                                "gen_version": 2,
                                 "index": question_index,
                                 "query_id": question_index,
                                 "source_info": {
@@ -137,23 +164,25 @@ def run():
                                 },
                                 "data": {
                                     "generation_model": model,
-                                    "prompt": prompt,
+                                    "prompt": system_prompt,
                                     "data_transaction": (
                                         "SUMMARIZATION" if summarized_text else None
                                     ),  # SUMMARIZATION, SPLITTING, None
                                     "text_from_transaction": summarized_text,
-                                    "generated_text": response_text,
+                                    "generated_questions": response_text,
                                     "generation_elapsed_time": elapsed_time,
                                 },
                             }
 
                             add_question_gen_data(question_gen_data)
+                            print(response_text)
                             print(
                                 f"{question_index}-{diff_level}-{q_type}-{model}-{group_item_list[0]['course']}-{group_item_list[0]['class']}-{group_item_list[0]['category']}- {source_token_size} DONE!"
                             )
+                            print('#' * 50)
                         except Exception as e:
+                            print(e)
                             pass
                             # raise Exception(f"Failed to open Excel file: {str(e)}")
-
 
 run()
