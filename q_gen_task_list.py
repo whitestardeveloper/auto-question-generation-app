@@ -20,25 +20,25 @@ q_types = [
 ]
 
 # 7 farklı model
-models = [
-    "GOOGLE (gemini-1.5-flash)",
-    "GOOGLE (gemma2)",
-    "MISTRAL (mistral-nemo)",
-    "META (llama3.1)",
-    "ALIBABA (qwen2.5)",
-    "Cohere For AI (aya-expanse)[8B]",
-    "NVIDIA (nvidia/nemotron-4-340b-instruct)",
-]
-
 # models = [
 #     "GOOGLE (gemini-1.5-flash)",
-#     "GOOGLE (gemma2) [27b]",
-#     "MISTRAL (mistral-small) [22b]",
-#     "META (llama3.1) [70b]",
-#     "ALIBABA (qwen2.5) [32b]",
-#     "Cohere For AI (aya-expanse)[32b]",
+#     "GOOGLE (gemma2)",
+#     "MISTRAL (mistral-nemo)",
+#     "META (llama3.1)",
+#     "ALIBABA (qwen2.5)",
+#     "Cohere For AI (aya-expanse)[8B]",
 #     "NVIDIA (nvidia/nemotron-4-340b-instruct)",
 # ]
+
+models = [
+    "GOOGLE (gemini-1.5-flash)",
+    "GOOGLE (gemma2) [27b]",
+    "MISTRAL (mistral-small) [22b]",
+    "META (llama3.1) [70b]",
+    "ALIBABA (qwen2.5) [32b]",
+    "Cohere For AI (aya-expanse)[32b]",
+    "NVIDIA (nvidia/nemotron-4-340b-instruct)",
+]
 
 
 # 60 farklı soru heterojen soru kaynağı
@@ -102,6 +102,9 @@ def run():
     #     2101,2102,2103,2104,2105,2106,2107,
     # ]
 
+    # job_list = [1397,1475,1807,1916,1929,1949,2042,2349,250,2587,2623,2735,2747,397,3974,4142,4233,4266,4282,4350,4422,4432,4517,4530,4750,5108,5143,5395,5437,5814,6052,61,6361,6365,6389,6392,6774,6877,6921,7066,7096,7124,7136,7397,7403,7494,774]
+    # job_list = [ 3483, 3490, 3497, 3651, 3672, 3756, 3924, 3938, 3945, 4029, 4057, 4064, 4085, 4099, 4106, 4176, 4209, 4220, 4262, 4318, 4323, 4325, 4388, 4416, 4420, 4437, 4490, 4503, 4531, 4535, 4591, 4631, 4722, 4757, 4827, 4897, 4939, 4974, 4981, 5108, 5800, 6010, 6059, 6101, 6304, 6311, 6368, 6423, 6430, 6542, 6563, 6605, 6612, 6633, 6654, 6775, 6782, 6794, 6808, 6831, 6841, 6849, 6877, 6954, 6978, 7062, 7242, 7249, 7263, 7368, 7508 ]
+    job_list = [3945, 4262, 4981, 5108, 6368]
     
     heterogenius_sources = build_source_list()
     for diff_level in diff_levels:
@@ -117,7 +120,7 @@ def run():
                 for model in models:
                     question_index += 1
 
-                    if question_index > 0:
+                    if question_index in job_list:
                         print('*' * 50)
                         print(
                             f"{question_index}-{diff_level}-{q_type}-{model}-{group_item_list[0]['course']}-{group_item_list[0]['class']}-{group_item_list[0]['category']}- {source_token_size} STARTED!"

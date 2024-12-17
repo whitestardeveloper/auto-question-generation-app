@@ -23,7 +23,7 @@ def question_type_prompt(q_type):
                             {"content": ".....", "correct": False},
                             {"content": ".....", "correct": True},
                             ...
-                        ]
+                        ],
                         "question_diffucult_level": "",
                     },
                     ...
@@ -49,7 +49,7 @@ def question_type_prompt(q_type):
                         "answers": [
                             {"content": "Doğru", "correct": True},
                             {"content": "Yanlış", "correct": False},
-                        ]
+                        ],
                         "question_diffucult_level": "",
                     },
                     ...
@@ -74,7 +74,7 @@ def question_type_prompt(q_type):
                         "question_body": "Soru metni ________ olarak tamamlanmalıdır...?",
                         "answers": [
                             {"content": "...", "correct": True},
-                        ]
+                        ],
                         "question_diffucult_level": "",
                     },
                     ...
@@ -100,7 +100,7 @@ def question_type_prompt(q_type):
                         "question_body": "Soru metni...?",
                         "answers": [
                             {"content": "...", "correct": True},
-                        ]
+                        ],
                         "question_diffucult_level": "",
                     },
                     ...
@@ -111,7 +111,7 @@ def question_type_prompt(q_type):
     # Eşleştirme Soru Promtu
     elif q_type == "Eşleştirme":
         prompt = """
-        Vereceğim direktifleri uygulayarak, eşleştirme soruları üret:
+        Vereceğim direktifleri uygulayarak 3 adet eşleştirme sorusu üret:
         Her soru, iki grup arasında doğru eşleştirme yapmayı gerektirmeli.
         Answers'taki cevapları ';' noktalı virgül ile ayır. Answers'ta yalnızca sorunun doğru cevabı olmalı.
         Her sorunun en sonunda doğru cevabı belirt.
@@ -132,7 +132,8 @@ def question_type_prompt(q_type):
                     {"content": "Grup A - 2 ; Grup B - 1", "correct": True},
                     ...
                 ]
-            }
+            },
+            ...
         ]
         """
 
@@ -154,7 +155,7 @@ def question_type_prompt(q_type):
                     "question_body": "Soru metni...?",
                     "answers": [
                         {"content": "...", "correct": True},
-                    ]
+                    ],
                     "question_diffucult_level": "",
                 },
                 ...
@@ -183,6 +184,7 @@ def get_prompt(q_type, question_count, q_diff_level):
         Sorularda metin görünmeyecek, bunu bilerek üret. Yani metni soruda göstermediğimiz için; metinde geçen, metindeki ... şekilde ifadeler soruda olmamalı.
 
         Soruların gövdesi soru formatında olsun. Yani soru cümlesi olsun.
+        Soruların json formatlarını düzgün oluştur. Parse etmeme gerek kalmasın. Direkt json ver.
         Bu bilgilerle {question_count} adet soru üreteceksin.
         {question_type_prompt(q_type)}
     """

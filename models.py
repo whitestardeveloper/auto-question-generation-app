@@ -8,24 +8,24 @@ load_dotenv()
 
 def get_model(model_key):
 
-    #  model_dict = {
-    #     "GOOGLE (gemini-1.5-flash)": "gemini-1.5-flash",
-    #     "GOOGLE (gemma2) [27b]": "gemma2:27b",
-    #     "Cohere For AI (aya-expanse)[32b]": "aya-expanse:32b",
-    #     "MISTRAL (mistral-small) [22b]": "mistral-small",
-    #     "META (llama3.1) [70b]": "llama3.1:70b",
-    #     "ALIBABA (qwen2.5) [32b]": "qwen2.5:32b",
-    #     "NVIDIA (nvidia/nemotron-4-340b-instruct)": "nvidia/nemotron-4-340b-instruct",
-    # }
     model_dict = {
-        "GOOGLE (gemini-1.5-flash)": "gemini-1.5-flash", 
-        "GOOGLE (gemma2)": "gemma2", 
-        "Cohere For AI (aya-expanse)[8B]": "aya-expanse",
-        "MISTRAL (mistral-nemo)": "mistral-nemo",
-        "META (llama3.1)": "llama3.1", 
-        "ALIBABA (qwen2.5)": "qwen2.5",
+        "GOOGLE (gemini-1.5-flash)": "gemini-1.5-flash",
+        "GOOGLE (gemma2) [27b]": "gemma2:27b",
+        "Cohere For AI (aya-expanse)[32b]": "aya-expanse:32b",
+        "MISTRAL (mistral-small) [22b]": "mistral-small",
+        "META (llama3.1) [70b]": "llama3.1:70b",
+        "ALIBABA (qwen2.5) [32b]": "qwen2.5:32b",
         "NVIDIA (nvidia/nemotron-4-340b-instruct)": "nvidia/nemotron-4-340b-instruct",
     }
+    # model_dict = {
+    #     "GOOGLE (gemini-1.5-flash)": "gemini-1.5-flash", 
+    #     "GOOGLE (gemma2)": "gemma2", 
+    #     "Cohere For AI (aya-expanse)[8B]": "aya-expanse",
+    #     "MISTRAL (mistral-nemo)": "mistral-nemo",
+    #     "META (llama3.1)": "llama3.1", 
+    #     "ALIBABA (qwen2.5)": "qwen2.5",
+    #     "NVIDIA (nvidia/nemotron-4-340b-instruct)": "nvidia/nemotron-4-340b-instruct",
+    # }
     return model_dict[model_key]
 
 
@@ -44,7 +44,7 @@ def generate_question(model_key, user_prompt, system_prompt):
                 response_mime_type="application/json"
             ),
         )
-        return json.loads(json.dumps(response.text))
+        return response.text
 
     elif selected_model in [
         "llama3.1",
@@ -72,7 +72,7 @@ def generate_question(model_key, user_prompt, system_prompt):
             # "format": "json",
         }   
         response = ollama.generate(**generate_params)
-        return json.loads(json.dumps(response["response"]))
+        return response["response"]
 
     elif selected_model == "nvidia/nemotron-4-340b-instruct":
         client = openai.OpenAI(
@@ -87,7 +87,7 @@ def generate_question(model_key, user_prompt, system_prompt):
                 {"role": "user", "content": user_prompt},
             ],
         )
-        response_text = json.loads(json.dumps(response.choices[0].message.content))
+        response_text = response.choices[0].message.content
         return response_text
     else:
         print("GEÇERSİZ MODEL...")
