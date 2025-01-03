@@ -1,6 +1,5 @@
 import openai
 import ollama
-import json
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
@@ -8,6 +7,7 @@ load_dotenv()
 
 def get_model(model_key):
 
+     #v2 model dict
     model_dict = {
         "GOOGLE (gemini-1.5-flash)": "gemini-1.5-flash",
         "GOOGLE (gemma2) [27b]": "gemma2:27b",
@@ -17,6 +17,7 @@ def get_model(model_key):
         "ALIBABA (qwen2.5) [32b]": "qwen2.5:32b",
         "NVIDIA (nvidia/nemotron-4-340b-instruct)": "nvidia/nemotron-4-340b-instruct",
     }
+    #v1 model dict
     # model_dict = {
     #     "GOOGLE (gemini-1.5-flash)": "gemini-1.5-flash", 
     #     "GOOGLE (gemma2)": "gemma2", 
@@ -34,7 +35,7 @@ def generate_question(model_key, user_prompt, system_prompt):
     print(selected_model)
 
     if selected_model in ["gemini-1.5-flash"]:
-        genai.configure(api_key="AIzaSyCYoC2JHVdk8Ji0vLxbspHVhScCQIO9dRs")
+        genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
         llm = genai.GenerativeModel(
             "gemini-1.5-flash", system_instruction=system_prompt
         )
@@ -77,7 +78,7 @@ def generate_question(model_key, user_prompt, system_prompt):
     elif selected_model == "nvidia/nemotron-4-340b-instruct":
         client = openai.OpenAI(
             base_url="https://integrate.api.nvidia.com/v1",
-            api_key="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",
+            api_key=os.environ.get("NVIDIA_API_KEY"),
         )
 
         response = client.chat.completions.create(

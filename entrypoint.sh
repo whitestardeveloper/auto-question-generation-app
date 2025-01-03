@@ -13,7 +13,8 @@ install_model() {
 }
 
 # List of models to check/install
-MODELS=("gemma2" "aya-expanse" "mistral-nemo" "llama3.1" "qwen2.5")
+# MODELS=("gemma2" "aya-expanse" "mistral-nemo" "llama3.1" "qwen2.5")
+MODELS=("gemma2:27b" "aya-expanse:32b" "mistral-small" "llama3.1:70b" "qwen2.5:32b")
 
 for model in "${MODELS[@]}"; do
     install_model $model

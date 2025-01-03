@@ -1,51 +1,17 @@
 from firebase_application import get_generated_question_list, add_question_ai_reviewer
 import json
 import ollama
-from pydantic import BaseModel
-from typing import List
-
-class EvaluationQuestion(BaseModel):
-    evaluation_type: str
-    evaluation_question: str
-    evaluation_value: int
-    description: str
-
-class QuestionEvaluation(BaseModel):
-    q1: EvaluationQuestion
-    q2: EvaluationQuestion
-    q3: EvaluationQuestion
-    q4: EvaluationQuestion
-    q5: EvaluationQuestion
-    q6: EvaluationQuestion
-
-class Question(BaseModel):
-    question: str
-    evaluations: QuestionEvaluation
-
-class EvaluationSchema(BaseModel):
-    questions: List[Question]
-
-def generate_json_for_ollama(rates_model: EvaluationSchema):
-    # Pydantic modelini dictionary formatına çevir
-    return rates_model.dict()
-
 
 def get_json_array_question(question_raw_list):
-    # question_raw_list zaten bir liste ya da dict ise string'e dönüştürmeye gerek yok
-    # print(type(question_raw_list))
     if isinstance(question_raw_list, str):
-        # Gereksiz "```json" ve "```" gibi karakterleri temizle
         question_raw_list = question_raw_list.replace("```json", "").replace("```", "")
-        # False/True ifadelerini Python'daki doğru karşılıklarına dönüştür
         question_raw_list = question_raw_list.replace("False", "false").replace("True", "true")
     try:
-        # JSON.parse yerine json.loads kullanarak geçerli bir JSON nesnesine dönüştürme
         parsed_json = json.loads(question_raw_list)
-        # Eğer parsed_json bir liste ise döndür, yoksa boş liste döndür
         return parsed_json if isinstance(parsed_json, list) else []
     except json.JSONDecodeError as error:
-        print("JSON decode hatası:", error)
-        return []  # JSON hatası varsa boş liste döndür
+        print("JSON decode error:", error)
+        return [] 
 
 def get_question_evaluation_prompt(questionType, questionDiffLevel):
     return f"""
@@ -192,9 +158,6 @@ def get_question_evaluation_prompt(questionType, questionDiffLevel):
 def ai_generate_evaluation(system_prompt, user_propmt):
     selected_model = 'gemma2:27b'
 
-    # rates_json = json.dumps(generate_json_for_ollama(rates_data))
-
-
     generate_params = {
         "model": selected_model,
         # 'options': Options(temperature=0.7),
@@ -205,18 +168,13 @@ def ai_generate_evaluation(system_prompt, user_propmt):
         # "format": Rates.model_json_schema(),
     }   
 
-    # print(generate_params)
-
     response = ollama.generate(**generate_params)
     return response["response"]
-    # return json.loads(json.dumps(response["response"]))
+
 
 def run():
-    index = 0
     question_list = get_generated_question_list()
-
     for key, obj_item in question_list.items():
-        # json_q = get_json_array_question(obj_item['data']['generated_questions'])
         questions = obj_item['data']['generated_questions']
         question_type = obj_item['questions_info']['question_type']
         question_difficulty_level = obj_item['questions_info']['question_difficulty_level']
@@ -225,12 +183,8 @@ def run():
         if key_index > 1:
             system_prompt = get_question_evaluation_prompt(question_type, question_difficulty_level)
             generated_evaluation = ai_generate_evaluation(system_prompt, questions)
-            # response_text = Rates.model_validate_json(generated_evaluation)
             add_question_ai_reviewer(generated_evaluation, key)
             print(generated_evaluation)
             print(f" completed => {key}")
          
-    # print('Total...')
-    # print(len(question_list.items()))
-
 run()

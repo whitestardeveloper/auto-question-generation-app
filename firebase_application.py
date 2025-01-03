@@ -1,13 +1,12 @@
 import firebase_admin
 from firebase_admin import credentials
-from firebase_admin import db
-import datetime
-import json
+import os
 
+# download serviceAccount.json file
 cred = credentials.Certificate("./serviceAccount.json")
 firebase_admin.initialize_app(
     cred,
-    {"databaseURL": "https://auto-question-gen-default-rtdb.firebaseio.com/"},
+    {"databaseURL": os.environ.get("FIREBASE_DB_URL")},
 )
 
 

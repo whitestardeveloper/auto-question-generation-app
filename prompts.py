@@ -165,17 +165,6 @@ def question_type_prompt(q_type):
     return prompt
 
 
-# def get_diff_level_promt(q_diff_level):
-    # diff_list = {
-    #     "kolay": "Temel bilgileri test eden ve anlaşılır sorular. Örnekler arasında basit tanımlar, yaygın olarak bilinen gerçekler veya temel aritmetik yer almaktadır.",
-    #     "orta": "Biraz eleştirel düşünme veya orta düzeyde anlayış gerektiren sorular. Bunlar kavramların birleştirilmesini veya biraz daha az yaygın bilgiyi içerebilir.",
-    #     "zor": "İleri düzeyde bilgi veya derin eleştirel düşünme gerektiren sorular. Bunlar genellikle karmaşık problemleri çözmeyi, incelikli konuları anlamayı veya uzmanlık bilgisini kullanmayı içerir.",
-    # }
-    # diff_level_main_message = f"Soruları üretirken kolay, orta ve zor olarak 3 adet zorluk seviyemiz var. Soruların hepsini {q_diff_level} seviyede üret. {q_diff_level} seviyesindeki sorular şu şekilde olur; {diff_list[q_diff_level]}"
-    # return diff_level_main_message
-    # return f"Soruları üretirken kolay, orta ve zor olarak 3 adet zorluk seviyemiz var. Soruların hepsi {q_diff_level} zorluk seviyesinde olsun."
-
-
 def get_prompt(q_type, question_count, q_diff_level):
     system_message_content = f"""
         Sana verilen bilgileri kullanarak {question_count} adet soru üret. Kendi yorumunu veya önceden bildiklerini kullanmadan, sadece verilen bilgilerden sorular oluştur. Soruları yalnızca Türkçe dilinde üret.
