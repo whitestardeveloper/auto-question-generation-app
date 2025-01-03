@@ -222,7 +222,7 @@ def run():
         question_difficulty_level = obj_item['questions_info']['question_difficulty_level']
 
         key_index = int(key.replace('question-', ''))
-        if key_index > 54:
+        if key_index > 1:
             system_prompt = get_question_evaluation_prompt(question_type, question_difficulty_level)
             generated_evaluation = ai_generate_evaluation(system_prompt, questions)
             # response_text = Rates.model_validate_json(generated_evaluation)
