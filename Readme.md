@@ -13,9 +13,9 @@ I used *“generated-question-list”* as the db name to save generated question
 After importing the source as above and entering the envs for the apikeys, you can start generating questions as below.
 
 ### required envs
-GOOGLE_API_KEY=
-NVIDIA_API_KEY=
-FIREBASE_DB_URL=
+- GOOGLE_API_KEY=
+- NVIDIA_API_KEY=
+- FIREBASE_DB_URL=
 
 After entering the envs, you can work either locally or with docker with or without deployment.
 ### with virtual environment
